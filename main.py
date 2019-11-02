@@ -116,7 +116,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 result += hhex+' '
             msg = result
         else:
-            msg = raw_data.decode('utf-8')
+            msg = raw_data.decode('utf-8', 'ignore')
 
         # 是否添加时间
         if self.ReceiveAddTime is True:
