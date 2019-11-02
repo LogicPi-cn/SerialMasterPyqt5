@@ -6,6 +6,7 @@ Module implementing MainWindow.
 
 import sys
 import datetime
+import binascii
 
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -13,10 +14,13 @@ from PyQt5 import *
 
 from Ui_main import Ui_MainWindow
 
+from Process import *
 from serial_ctrl import *
 
-# 串口句柄，全局
+# 串口句柄
 g_serial = None
+# 串口已打开
+g_port_is_open = False
 
 # 接收线程运行标志位
 g_rec_run = False
@@ -62,7 +66,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # 参数
         self.port = ""
         self.bps = 9600
-        self.opened = False
         
         # 接收 ASCII 或 HEX 显示
         self.ReceiveAsHex = False
@@ -175,23 +178,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         打开/关闭 串口
         """
 
-        global g_serial, g_rec_run
+        global g_serial, g_rec_run, g_port_is_open
 
-        if self.opened:
+        if g_port_is_open:
 
             # 关闭接收线程
             g_rec_run = False
+            # 全部变量关闭
+            g_port_is_open = False
 
             close_port(g_serial)
-            self.opened = False
             self.statusBar.showMessage("关闭串口")
             self.pushButton_Open.setText("打开")
 
         else:
+
             g_serial = open_port(self.port, self.bps)
+
             if g_serial is not None:
+
+                g_port_is_open = True
+
                 self.statusBar.showMessage("打开串口成功")
-                self.opened = True
                 self.pushButton_Open.setText("关闭")
 
                 # 接收线程启动
@@ -220,7 +228,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         发送
         """
-        pass
+
+        global g_port_is_open, g_serial
+
+        raw_data = self.textEdit_Send.toPlainText()
+
+        if len(raw_data) == 0:
+            self.statusBar.showMessage("没有要发送的数据")
+            return
+
+        # 确认串口已经打开才能发送数据
+        if g_port_is_open is True:
+            
+            # 是否HEX发送
+            if self.SendAsHex is True:
+                msg = Str2Hex(raw_data)
+                g_serial.write(bytes(msg))
+            else:
+                g_serial.write(raw_data.encode('utf-8'))
 
     @pyqtSlot(str)
     def on_comboBox_BaundRate_currentIndexChanged(self, p0):
@@ -229,7 +254,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         self.bps = int(p0)
         
-    
     @pyqtSlot(bool)
     def on_checkBox_ReceiveAutoNewLine_clicked(self, checked):
         """
@@ -264,9 +288,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         接收清零
         """
         global g_rec_cnt
-        
-        self.textEdit_Receive.setText("")
+
         g_rec_cnt = 0
+        self.textEdit_Receive.setText("")
         self.label_ReceiveCnt.setText("0")
     
     @pyqtSlot()
@@ -276,8 +300,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         global g_snd_cnt
 
-        self.textEdit_Send.setText("")
         g_snd_cnt = 0
+        self.textEdit_Send.setText("")
         self.label_SendCnt.setText("0")
 
 if __name__ == '__main__':

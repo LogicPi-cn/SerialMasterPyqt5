@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Project SYSTEM "Project-5.1.dtd">
 <!-- eric project file for project SerialMaster -->
-<!-- Saved: 2019-11-02, 10:32:46 -->
+<!-- Saved: 2019-11-02, 23:01:16 -->
 <!-- Copyright (C) 2019 ,  -->
 <Project version="5.1">
   <Language>en_US</Language>
@@ -13,8 +13,17 @@
   <Email></Email>
   <Eol index="0"/>
   <Sources>
+    <Source>Ui_main.py</Source>
     <Source>__init__.py</Source>
+    <Source>main.py</Source>
+    <Source>source_rc.py</Source>
   </Sources>
+  <Forms>
+    <Form>main.ui</Form>
+  </Forms>
+  <Resources>
+    <Resource>source.qrc</Resource>
+  </Resources>
   <Vcs>
     <VcsType>Git</VcsType>
     <VcsOptions>
