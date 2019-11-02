@@ -229,7 +229,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         发送
         """
 
-        global g_port_is_open, g_serial
+        global g_port_is_open, g_serial, g_snd_cnt
 
         raw_data = self.textEdit_Send.toPlainText()
 
@@ -246,6 +246,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 g_serial.write(bytes(msg))
             else:
                 g_serial.write(raw_data.encode('utf-8'))
+
+            # 计数
+            g_snd_cnt += len(raw_data)
+            self.label_SendCnt.setText(str(g_snd_cnt))
 
     @pyqtSlot(str)
     def on_comboBox_BaundRate_currentIndexChanged(self, p0):
