@@ -11,7 +11,7 @@ rmdir dist /S /Q
 
 mkdir %folder%
 
-pyinstaller -w -F -iicon/logo.ico main.py
+pyinstaller -w -F -i icon/logo.ico main.py
 
 copy dist\main.exe %folder%\%appName%-%dd%.exe
 
