@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>640</height>
+    <width>864</width>
+    <height>623</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>800</width>
-    <height>640</height>
+    <width>0</width>
+    <height>0</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -25,12 +25,61 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_2">
+    <item row="2" column="0">
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>99</height>
+       </size>
+      </property>
+      <property name="title">
+       <string>发送设置</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_4">
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_SendCnt">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>发送计数：</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QPushButton" name="pushButton_SendClearCnt">
+         <property name="text">
+          <string>清空</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="checkBox_SendHEX">
+         <property name="text">
+          <string>十六进制</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
     <item row="1" column="0">
      <widget class="QGroupBox" name="groupBox_2">
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>16777215</height>
+        <height>143</height>
        </size>
       </property>
       <property name="title">
@@ -70,6 +119,9 @@
        </item>
        <item row="4" column="1">
         <widget class="QLabel" name="label_ReceiveCnt">
+         <property name="frameShape">
+          <enum>QFrame::Box</enum>
+         </property>
          <property name="text">
           <string/>
          </property>
@@ -162,7 +214,7 @@
         <widget class="QComboBox" name="comboBox_Port">
          <property name="minimumSize">
           <size>
-           <width>160</width>
+           <width>0</width>
            <height>0</height>
           </size>
          </property>
@@ -253,52 +305,6 @@
       </layout>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QGroupBox" name="groupBox_3">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>7777777</height>
-       </size>
-      </property>
-      <property name="title">
-       <string>发送设置</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_4">
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_SendCnt">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>发送计数：</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QPushButton" name="pushButton_SendClearCnt">
-         <property name="text">
-          <string>清空</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QCheckBox" name="checkBox_SendHEX">
-         <property name="text">
-          <string>十六进制</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
     <item row="3" column="0" rowspan="2">
      <spacer name="verticalSpacer">
       <property name="orientation">
@@ -311,6 +317,16 @@
        </size>
       </property>
      </spacer>
+    </item>
+    <item row="0" column="1" rowspan="4" colspan="2">
+     <widget class="QTextEdit" name="textEdit_Receive">
+      <property name="minimumSize">
+       <size>
+        <width>600</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
     </item>
     <item row="4" column="1">
      <widget class="QTextEdit" name="textEdit_Send">
@@ -329,9 +345,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1" rowspan="4" colspan="2">
-     <widget class="QTextEdit" name="textEdit_Receive"/>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -339,7 +352,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>864</width>
      <height>23</height>
     </rect>
    </property>
