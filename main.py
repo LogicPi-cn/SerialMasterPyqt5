@@ -13,22 +13,10 @@ from PyQt5.QtWidgets import *
 from PyQt5 import *
 
 from Ui_main import Ui_MainWindow
+from drawCurve import dialogDrawCurve
 
 from Process import *
 from serial_ctrl import *
-
-# 串口句柄
-g_serial = None
-# 串口已打开
-g_port_is_open = False
-
-# 接收线程运行标志位
-g_rec_run = False
-
-# 接收计数
-g_rec_cnt = 0
-# 发送计数
-g_snd_cnt = 0
 
 # 接收数据线程
 class ReceiveThread(QThread):
@@ -37,6 +25,9 @@ class ReceiveThread(QThread):
         super(ReceiveThread, self).__init__(parent)
 
     def run(self):
+
+        global g_rec_run, g_serial
+
         while g_rec_run:
             data = None
             try:
@@ -60,11 +51,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
 
+        # 动态绘制曲线窗口
+        self.dlg_drawCurve = None
+
         # 串口列表
         self.get_serial()
 
         # 参数
-        self.port = ""
+        self.port = self.comboBox_Port.currentText()
         self.bps = 9600
         
         # 接收 ASCII 或 HEX 显示
@@ -135,6 +129,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         cursor.movePosition(QtGui.QTextCursor.End)
         self.textEdit_Receive.setTextCursor(cursor)
 
+        # 输出显示
         self.textEdit_Receive.insertPlainText(msg)
     
     @pyqtSlot(int)
@@ -187,6 +182,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # 全部变量关闭
             g_port_is_open = False
 
+            # 主窗口
             close_port(g_serial)
             self.statusBar.showMessage("关闭串口")
             self.pushButton_Open.setText("打开")
@@ -307,6 +303,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         g_snd_cnt = 0
         self.textEdit_Send.setText("")
         self.label_SendCnt.setText("0")
+    
+    @pyqtSlot()
+    def on_actionDrawCurve_triggered(self):
+        """
+        动态绘制曲线窗口
+        """
+
+        global g_port_is_open, g_rec_run, g_serial
+
+        # 如果串口已经打开，要关闭
+        if g_port_is_open:
+
+            # 关闭接收线程
+            g_rec_run = False
+            # 全部变量关闭
+            g_port_is_open = False
+
+            close_port(g_serial)
+            self.statusBar.showMessage("关闭串口")
+            self.pushButton_Open.setText("打开")
+
+        # 参数传递
+        self.dlg_drawCurve = None
+        self.dlg_drawCurve = dialogDrawCurve()
+        self.dlg_drawCurve.port = self.comboBox_Port.currentText()
+        self.dlg_drawCurve.bps = int(self.comboBox_BaundRate.currentText())
+
+        # 打开窗口
+        self.dlg_drawCurve.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

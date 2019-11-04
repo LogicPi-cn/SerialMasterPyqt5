@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>864</width>
-    <height>623</height>
+    <height>645</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -398,7 +398,27 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionDrawCurve"/>
+   <addaction name="actionSetting"/>
   </widget>
+  <action name="actionDrawCurve">
+   <property name="icon">
+    <iconset resource="source.qrc">
+     <normaloff>:/icon/曲线.png</normaloff>:/icon/曲线.png</iconset>
+   </property>
+   <property name="text">
+    <string>DrawCurve</string>
+   </property>
+  </action>
+  <action name="actionSetting">
+   <property name="icon">
+    <iconset resource="source.qrc">
+     <normaloff>:/icon/设 置.png</normaloff>:/icon/设 置.png</iconset>
+   </property>
+   <property name="text">
+    <string>Setting</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="source.qrc"/>

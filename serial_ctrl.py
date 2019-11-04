@@ -11,6 +11,18 @@ import serial.tools.list_ports
 import datetime
 import threading
 
+# 串口句柄
+g_serial = None
+# 串口已打开
+g_port_is_open = False
+
+# 接收线程运行标志位
+g_rec_run = False
+
+# 接收计数
+g_rec_cnt = 0
+# 发送计数
+g_snd_cnt = 0
 
 def log_print(str):
     """

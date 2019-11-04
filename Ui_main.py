@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(864, 623)
+        MainWindow.resize(864, 645)
         MainWindow.setMinimumSize(QtCore.QSize(0, 0))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/icon/串口.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -167,11 +167,23 @@ class Ui_MainWindow(object):
         self.toolBar = QtWidgets.QToolBar(MainWindow)
         self.toolBar.setObjectName("toolBar")
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
+        self.actionDrawCurve = QtWidgets.QAction(MainWindow)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/icon/曲线.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionDrawCurve.setIcon(icon1)
+        self.actionDrawCurve.setObjectName("actionDrawCurve")
+        self.actionSetting = QtWidgets.QAction(MainWindow)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(":/icon/设 置.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.actionSetting.setIcon(icon2)
+        self.actionSetting.setObjectName("actionSetting")
         self.menuBar.addAction(self.menu.menuAction())
         self.menuBar.addAction(self.menu_2.menuAction())
         self.menuBar.addAction(self.menu_3.menuAction())
         self.menuBar.addAction(self.menu_4.menuAction())
         self.menuBar.addAction(self.menu_5.menuAction())
+        self.toolBar.addAction(self.actionDrawCurve)
+        self.toolBar.addAction(self.actionSetting)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -213,6 +225,8 @@ class Ui_MainWindow(object):
         self.menu_4.setTitle(_translate("MainWindow", "工具"))
         self.menu_5.setTitle(_translate("MainWindow", "帮助"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
+        self.actionDrawCurve.setText(_translate("MainWindow", "DrawCurve"))
+        self.actionSetting.setText(_translate("MainWindow", "Setting"))
 
 import source_rc
 
