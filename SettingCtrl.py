@@ -19,6 +19,10 @@ class SettingCtrl():
             cfg.add_section("curve")
             cfg.set("curve", "x_len", "500")
 
+            cfg.add_section("serial")
+            cfg.set("serial", "bps", "115200")
+            cfg.set("serial", "port", "COM1")
+
             # Write File
             cfg.write(open(self.fileName,'w'))
 

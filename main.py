@@ -17,6 +17,7 @@ from drawCurve import dialogDrawCurve
 
 from Process import *
 from serial_ctrl import *
+from SettingCtrl import *
 
 # 接收数据线程
 class ReceiveThread(QThread):
@@ -32,8 +33,8 @@ class ReceiveThread(QThread):
             data = None
             try:
                 data = g_serial.read_all()
-            except Exception():
-                pass
+            except Exception as e:
+                print(e)
             if data is not  None:
                 self.finishSignal.emit(data)
 
@@ -51,15 +52,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
 
+        # 参数读取
+        self.params = SettingCtrl()
+        self.load_params()
+
         # 动态绘制曲线窗口
         self.dlg_drawCurve = None
-
-        # 串口列表
-        self.get_serial()
-
-        # 参数
-        self.port = self.comboBox_Port.currentText()
-        self.bps = 9600
         
         # 接收 ASCII 或 HEX 显示
         self.ReceiveAsHex = False
@@ -74,6 +72,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.SendAsHex = False
         # 发送 计数
         self.SendCnt = 0
+
+    def load_params(self):
+        """
+        读取参数
+        """
+        self.get_serial()
+
+        self.bps = self.params.load("serial", "bps")
+        self.port = self.params.load("serial", "port")
+
+        self.comboBox_BaundRate.setCurrentText(str(self.bps))
+        self.port = self.comboBox_Port.currentText()
 
     def get_serial(self):
         """
@@ -131,6 +141,91 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # 输出显示
         self.textEdit_Receive.insertPlainText(msg)
+
+    def close_serial(self):
+        """
+        关闭串口
+        """
+        global g_serial, g_rec_run, g_port_is_open
+
+        # 关闭接收线程
+        g_rec_run = False
+        # 全部变量关闭
+        g_port_is_open = False
+
+        # 主窗口
+        close_port(g_serial)
+        self.statusBar.showMessage("关闭串口 : " + str(self.port))
+        self.pushButton_Open.setText("打开")
+
+    def open_serial(self):
+        """
+        打开串口
+        """
+        global g_serial, g_rec_run, g_port_is_open
+
+        g_serial = open_port(self.port, self.bps)
+
+        if g_serial is not None:
+
+            g_port_is_open = True
+
+            self.statusBar.showMessage("打开串口成功 : " + str(self.port))
+            self.pushButton_Open.setText("关闭")
+
+            # 接收线程启动
+            self.t_rec = ReceiveThread()
+            self.t_rec.finishSignal.connect(self.print_receive)
+            self.t_rec.start()
+            g_rec_run = True
+
+            # 计数器清零
+            self.ReceiveCnt = 0
+
+        else:
+            self.statusBar.showMessage("打开串口失败 : " + str(self.port))
+
+    def open_or_close_port(self):
+        """
+        打开或关闭串口
+        """
+
+        global g_serial, g_rec_run, g_port_is_open
+
+        if g_port_is_open:
+
+            # 关闭接收线程
+            g_rec_run = False
+            # 全部变量关闭
+            g_port_is_open = False
+
+            # 主窗口
+            close_port(g_serial)
+            self.statusBar.showMessage("关闭串口 : " + str(self.port))
+            self.pushButton_Open.setText("打开")
+
+        else:
+
+            g_serial = open_port(self.port, self.bps)
+
+            if g_serial is not None:
+
+                g_port_is_open = True
+
+                self.statusBar.showMessage("打开串口成功 : " + str(self.port))
+                self.pushButton_Open.setText("关闭")
+
+                # 接收线程启动
+                self.t_rec = ReceiveThread()
+                self.t_rec.finishSignal.connect(self.print_receive)
+                self.t_rec.start()
+                g_rec_run = True
+
+                # 计数器清零
+                self.ReceiveCnt = 0
+
+            else:
+                self.statusBar.showMessage("打开串口失败 : " + str(self.port))
     
     @pyqtSlot(int)
     def on_comboBox_FlowCtrl_currentIndexChanged(self, index):
@@ -151,7 +246,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         串口调整
         """
+        global g_serial, g_rec_run, g_port_is_open
+
         self.port = p0
+
+        if g_port_is_open:
+            self.close_serial()
+            self.open_serial()
     
     @pyqtSlot(int)
     def on_comboBox_DataLen_currentIndexChanged(self, index):
@@ -172,43 +273,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         打开/关闭 串口
         """
-
-        global g_serial, g_rec_run, g_port_is_open
-
-        if g_port_is_open:
-
-            # 关闭接收线程
-            g_rec_run = False
-            # 全部变量关闭
-            g_port_is_open = False
-
-            # 主窗口
-            close_port(g_serial)
-            self.statusBar.showMessage("关闭串口")
-            self.pushButton_Open.setText("打开")
-
-        else:
-
-            g_serial = open_port(self.port, self.bps)
-
-            if g_serial is not None:
-
-                g_port_is_open = True
-
-                self.statusBar.showMessage("打开串口成功")
-                self.pushButton_Open.setText("关闭")
-
-                # 接收线程启动
-                self.t_rec = ReceiveThread()
-                self.t_rec.finishSignal.connect(self.print_receive)
-                self.t_rec.start()
-                g_rec_run = True
-
-                # 计数器清零
-                self.ReceiveCnt = 0
-
-            else:
-                self.statusBar.showMessage("打开串口失败")
+        self.open_or_close_port()
     
     @pyqtSlot()
     def on_pushButton_RefreshPort_clicked(self):
@@ -253,6 +318,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         波特率
         """
         self.bps = int(p0)
+
+        self.params.save("serial", "bps", str(self.bps))
         
     @pyqtSlot(bool)
     def on_checkBox_ReceiveAutoNewLine_clicked(self, checked):

@@ -14,6 +14,7 @@ from SettingCtrl import *
 
 import numpy as np
 import random
+import re
 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -32,12 +33,13 @@ class ReceiveThread(QThread):
         global g_rec_run, g_serial
 
         while g_rec_run:
+
             data = None
             try:
                 data = g_serial.read_all()
-            except Exception():
-                pass
-            if data is not  None:
+            except Exception as e:
+                print(e)
+            if data is not None:
                 self.finishSignal.emit(data)
 
 class Figure_Canvas(FigureCanvas):
@@ -63,6 +65,9 @@ class dialogDrawCurve(QDialog, Ui_Dialog):
         # 变量控制
         self.params = SettingCtrl()
         self.load_params()
+
+        # 变量
+        self.data_end_with_space = True
 
         # 参数传递
         self.port = ""
@@ -124,14 +129,20 @@ class dialogDrawCurve(QDialog, Ui_Dialog):
         """
         刷新数据
         """
+
         # 如果没有数据，就不要麻烦下面的操作了
         if len(raw_data) == 0:
             return
 
-        try:
-            in_data = float(raw_data)
-        except Exception:
-            in_data = 0
+        tmp = "".join(str(raw_data).split())
+        tmp_list = re.findall(r"\d+\.?\d*", tmp)
+
+        if len(tmp_list) > 0:
+            in_data = tmp_list[0]
+        else:
+            return
+
+        # print(in_data)
 
         self.UpdateArray(self.y01, in_data)
         self.line01.set_ydata(self.y01)
@@ -145,20 +156,10 @@ class dialogDrawCurve(QDialog, Ui_Dialog):
         """
         开始按钮
         """
+
         global g_serial, g_rec_run, g_port_is_open
 
-        if g_port_is_open:
-
-            # 关闭接收线程
-            g_rec_run = False
-            # 全部变量关闭
-            g_port_is_open = False
-
-            close_port(g_serial)
-            self.label_Status.setText("关闭串口")
-            self.pushButton_Start.setText("打开")
-
-        else:
+        if g_port_is_open is not True:
 
             g_serial = open_port(self.port, self.bps)
 
@@ -166,8 +167,7 @@ class dialogDrawCurve(QDialog, Ui_Dialog):
 
                 g_port_is_open = True
 
-                self.label_Status.setText("打开串口成功")
-                self.pushButton_Start.setText("关闭")
+                self.label_Status.setText("打开串口成功 : " + str(self.port))
 
                 # 接收线程启动
                 self.t_rec = ReceiveThread()
@@ -177,6 +177,10 @@ class dialogDrawCurve(QDialog, Ui_Dialog):
 
             else:
                 self.label_Status.setText("打开串口失败")
+
+        else:
+
+            self.label_Status.setText("串口已打开")
     
     @pyqtSlot(bool)
     def on_radioButton_DataFormat10_toggled(self, checked):
@@ -222,3 +226,37 @@ class dialogDrawCurve(QDialog, Ui_Dialog):
         
         self.params.save("curve", "x_len", str(self.x_len))
         self.label_Status.setText("请关闭窗口后重新打开")
+    
+    @pyqtSlot(bool)
+    def on_radioButton_DataEnd_Space_toggled(self, checked):
+        """
+        以空格结尾
+        """
+        self.data_end_with_space = True
+    
+    @pyqtSlot(bool)
+    def on_radioButton_DataEnd_Custom_toggled(self, checked):
+        """
+        自定义
+        """
+        self.data_end_with_space = False
+    
+    @pyqtSlot()
+    def on_pushButton_Stop_clicked(self):
+        """
+        关闭串口
+        """
+        global g_serial, g_rec_run, g_port_is_open
+
+        if g_port_is_open:
+
+            # 关闭接收线程
+            g_rec_run = False
+            # 全部变量关闭
+            g_port_is_open = False
+
+            close_port(g_serial)
+            self.label_Status.setText("关闭串口成功")
+
+        else:
+            self.label_Status.setText("没有可关闭的串口")
