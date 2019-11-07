@@ -30,6 +30,7 @@ class ReceiveThread(QThread):
         global g_rec_run, g_serial
 
         while g_rec_run:
+            time.sleep(0.001)
             data = None
             try:
                 data = g_serial.read_all()

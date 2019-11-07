@@ -15,6 +15,7 @@ from SettingCtrl import *
 import numpy as np
 import random
 import re
+import time
 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -33,6 +34,8 @@ class ReceiveThread(QThread):
         global g_rec_run, g_serial
 
         while g_rec_run:
+
+            time.sleep(0.001)
 
             data = None
             try:
